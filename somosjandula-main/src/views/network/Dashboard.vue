@@ -1,18 +1,5 @@
 <template>
   <div :class="{ 'fullscreen': estadoExpandido }">
-    <!-- Tabla resumen esquina superior derecha -->
-    <div class="networks-summary-table">
-      <h4 class="summary-title">🌐 Redes</h4>
-      <table class="summary-table">
-        <tbody>
-          <tr v-for="item in ultimasTelemetrias" :key="item.ssid">
-            <td class="network-name">{{ item.ssid }}</td>
-            <td :class="['status-dot', obtenerClaseEstado(item.estado)]"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
     <!-- Estado Actual -->
     <div :class="['card', { 'card-fullscreen': estadoExpandido }]">
       <div class="card-header-flex">
@@ -189,14 +176,16 @@ export default {
 }
 
 .card-fullscreen {
-  height: calc(100vh - 2rem);
+  max-height: auto;
   display: flex;
   flex-direction: column;
 }
 
 .card-fullscreen .status-grid {
-  flex: 1;
-  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  overflow: visible;
 }
 
 .card-header-flex {
