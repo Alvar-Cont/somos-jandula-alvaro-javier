@@ -1,78 +1,100 @@
 <template>
-  <div class="network-scanner">
-    <div class="placeholder-content">
-      <div class="construction-icon">🚧</div>
-      <h1>🌐 Escaneo de Redes</h1>
-      <p class="placeholder-text">Aquí iría la visualización general de las redes</p>
-      <p class="construction-label">En construcción</p>
+  <div id="app" style="padding-top: 20px;">
+    <!-- Navegación de Tabs -->
+    <div class="nav-tabs">
+      <button 
+        v-for="tab in tabs" 
+        :key="tab"
+        @click="tabActivo = tab"
+        :class="['tab-btn', { activo: tabActivo === tab }]"
+      >
+        {{ tab === 'dashboard' ? '📊 Dashboard' : tab === 'config' ? '⚙️ Configuración' : '🔧 Administración' }}
+      </button>
+    </div>
+
+    <!-- Contenido -->
+    <div class="container">
+      <div v-if="tabActivo === 'dashboard'">
+        <Dashboard />
+      </div>
+      <div v-if="tabActivo === 'config'">
+        <Configuracion />
+      </div>
+      <div v-if="tabActivo === 'admin'">
+        <Administracion :redes="redes" />
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-// Página de prueba - sin funcionalidad implementada
+<script>
+import Dashboard from './Dashboard.vue'
+import ConfiguracionSimple from './ConfiguracionSimple.vue'
+import AdministracionSimple from './AdministracionSimple.vue'
+
+export default {
+  components: {
+    Dashboard,
+    'Configuracion': ConfiguracionSimple,
+    'Administracion': AdministracionSimple
+  },
+  data() {
+    return {
+      tabActivo: 'dashboard',
+      tabs: ['dashboard', 'config', 'admin']
+    }
+  }
+}
 </script>
 
 <style scoped>
-.network-scanner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+#app {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
-.placeholder-content {
-  text-align: center;
-  background: white;
-  padding: 60px 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
-}construction-icon {
-  font-size: 5em;
-  margin-bottom: 20px;
-  animation: swing 2s ease-in-out infinite;
+.nav-tabs {
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  gap: 0;
+  padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-bottom: 2px solid #e0e0e0;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes swing {
-  0%, 100% { transform: rotate(-10deg); }
-  50% { transform: rotate(10deg); }
-}
-
-.placeholder-content h1 {
-  font-size: 2.5em;
-  color: #667eea;
-  margin-bottom: 20px;
-}
-
-.placeholder-text {
-  font-size: 1.2em;
+.tab-btn {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
   color: #666;
-  margin: 0 0 15px 0;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
 }
 
-.construction-label {
-  font-size: 1.1em;
-  color: #f39c12;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+.tab-btn:hover {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
 }
 
-@media (max-width: 768px) {
-  .placeholder-content {
-    padding: 40px 30px;
-  }
+.tab-btn.activo {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
 
-  .placeholder-content h1 {
-    font-size: 2em;
-  }
-
-  .placeholder-text {
-    font-size: 1em;
-  }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: calc(100vh - 150px);
 }
 </style>
 
