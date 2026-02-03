@@ -1,5 +1,18 @@
 <template>
   <div class="contenedor-scroll-horizontal" id="djg-main-box">
+    <!-- Tabla resumen esquina superior derecha -->
+    <div class="networks-summary-table">
+      <h4 class="summary-title">🌐 Redes</h4>
+      <table class="summary-table">
+        <tbody>
+          <tr v-for="item in ultimasTelemetrias" :key="item.ssid">
+            <td class="network-name">{{ item.ssid }}</td>
+            <td :class="['status-dot', obtenerClaseEstado(item.estado)]"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- PANEL IZQUIERDO -->
     <div id="panel">
       <!-- Localizador -->
@@ -644,7 +657,44 @@ const recargarEspaciosFijos = async () => {
 // init
 applyDimensions()
 
+// Telemetría - Redes
+type TelemetriaItem = { id: number; ssid: string; estado: string; timestamp: string }
+const telemetria = ref<TelemetriaItem[]>([])
+
+const ultimasTelemetrias = computed(() => {
+  const mapa = new Map<string, TelemetriaItem>()
+  for (const item of telemetria.value) {
+    if (!mapa.has(item.ssid) || new Date(item.timestamp) > new Date(mapa.get(item.ssid)!.timestamp)) {
+      mapa.set(item.ssid, item)
+    }
+  }
+  return Array.from(mapa.values())
+})
+
+const cargarTelemetria = () => {
+  try {
+    fetch('http://localhost:8084/consultaHistorico')
+      .then(res => res.json())
+      .then(data => {
+        telemetria.value = Array.isArray(data) ? data : []
+      })
+      .catch(err => console.log('Error cargando telemetría:', err))
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
+const obtenerClaseEstado = (estado: string) => {
+  const clases: Record<string, string> = {
+    'Conectado': 'conectado',
+    'FalloDeAuth': 'fallo',
+    'SinSenal': 'sin-senal'
+  }
+  return clases[estado] || 'desconocido'
+}
+
 onMounted(async () => {
+  cargarTelemetria()
   await cargarCursosYEspaciosFijos()
 
   loadingDispositivos.value = true
@@ -1001,4 +1051,82 @@ button:hover {
 #aula2-12 { height: 11.3%; width: 11.4%; top: 70.6%; left: 18.9%; }
 #aseos2-m {height:11.6%;width:3.2%;top:70.6%;left:30%;}
 #aseos2-f {height:11.6%;width:3.2%;top:70.6%;left:33.2%;}
+
+/* Tabla resumen en esquina superior derecha */
+.networks-summary-table {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-width: 220px;
+  font-size: 0.85em;
+}
+
+.summary-title {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #333;
+  padding: 0;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.summary-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.network-name {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 500;
+  color: #333;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-dot {
+  padding: 6px 8px;
+  text-align: center;
+  width: 20px;
+}
+
+.status-dot::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.status-dot.conectado::before {
+  background-color: #28a745;
+}
+
+.status-dot.fallo::before {
+  background-color: #dc3545;
+}
+
+.status-dot.sin-senal::before {
+  background-color: #ffc107;
+}
+
+.status-dot.desconocido::before {
+  background-color: #6c757d;
+}
 </style>

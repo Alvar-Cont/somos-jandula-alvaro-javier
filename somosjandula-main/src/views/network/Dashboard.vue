@@ -1,5 +1,18 @@
 <template>
   <div :class="{ 'fullscreen': estadoExpandido }">
+    <!-- Tabla resumen esquina superior derecha -->
+    <div class="networks-summary-table">
+      <h4 class="summary-title">🌐 Redes</h4>
+      <table class="summary-table">
+        <tbody>
+          <tr v-for="item in ultimasTelemetrias" :key="item.ssid">
+            <td class="network-name">{{ item.ssid }}</td>
+            <td :class="['status-dot', obtenerClaseEstado(item.estado)]"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Estado Actual -->
     <div :class="['card', { 'card-fullscreen': estadoExpandido }]">
       <div class="card-header-flex">
@@ -368,5 +381,83 @@ tbody tr:hover {
 .badge.sin-senal {
   background: #fff3cd;
   color: #856404;
+}
+
+/* Tabla resumen en esquina superior derecha */
+.networks-summary-table {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-width: 220px;
+  font-size: 0.85em;
+}
+
+.summary-title {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #333;
+  padding: 0;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.summary-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.network-name {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 500;
+  color: #333;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-dot {
+  padding: 6px 8px;
+  text-align: center;
+  width: 20px;
+}
+
+.status-dot::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.status-dot.conectado::before {
+  background-color: #28a745;
+}
+
+.status-dot.fallo::before {
+  background-color: #dc3545;
+}
+
+.status-dot.sin-senal::before {
+  background-color: #ffc107;
+}
+
+.status-dot.desconocido::before {
+  background-color: #6c757d;
 }
 </style>
