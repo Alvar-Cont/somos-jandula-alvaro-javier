@@ -9,15 +9,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// Servicio para manejar la lógica de negocio de la telemetría
 @Service
 public class TelemetriaService {
     
     @Autowired
     private TelemetriaRepository telemetriaRepository;
     
-    // Método para validar que los campos obligatorios no sean nulos
-    private void validarCamposObligatorios(TelemetriaDTO telemetriaDTO) throws CampoObligatorioException {
+    private void validarCamposObligatorios(TelemetriaDTO telemetriaDTO) {
         if (telemetriaDTO.getSsid() == null) {
             throw new CampoObligatorioException("ssid");
         }
@@ -29,12 +27,9 @@ public class TelemetriaService {
         }
     }
     
-    // Método para guardar un nuevo registro de telemetría
-    public void guardarTelemetria(TelemetriaDTO telemetriaDTO) throws CampoObligatorioException {
-        // Validar que los campos principales no sean nulos
+    public void guardarTelemetria(TelemetriaDTO telemetriaDTO) {
         validarCamposObligatorios(telemetriaDTO);
         
-        // Crear la entidad y guardarla
         TelemetriaEntity entidad = new TelemetriaEntity(
             telemetriaDTO.getSsid(),
             telemetriaDTO.getEstado(),
@@ -44,7 +39,6 @@ public class TelemetriaService {
         telemetriaRepository.save(entidad);
     }
     
-    // Método para obtener todos los registros de telemetría
     public List<TelemetriaEntity> obtenerTodoElHistorial() {
         return telemetriaRepository.findAll();
     }

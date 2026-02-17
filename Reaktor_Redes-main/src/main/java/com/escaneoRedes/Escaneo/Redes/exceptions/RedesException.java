@@ -1,30 +1,11 @@
 package com.escaneoRedes.Escaneo.Redes.exceptions;
 
-// Excepción personalizada para errores de la aplicación de redes
-public class RedesException extends Exception {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+public class RedesException extends ResponseStatusException {
     
-    private int codigo;
-    private String mensaje;
-    
-    // Constructor con código y mensaje
-    public RedesException(int codigo, String mensaje) {
-        super(mensaje);
-        this.codigo = codigo;
-        this.mensaje = mensaje;
-    }
-    
-    // Constructor solo con mensaje
-    public RedesException(String mensaje) {
-        super(mensaje);
-        this.mensaje = mensaje;
-    }
-    
-    // Getters
-    public int getCodigo() {
-        return codigo;
-    }
-    
-    public String getMensaje() {
-        return mensaje;
+    public RedesException(HttpStatus status, String mensaje) {
+        super(status, mensaje);
     }
 }

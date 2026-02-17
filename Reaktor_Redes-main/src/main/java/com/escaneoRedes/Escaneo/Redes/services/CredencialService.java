@@ -12,15 +12,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-// Servicio para manejar la lógica de negocio de las credenciales de red
 @Service
 public class CredencialService {
     
     @Autowired
     private CredencialRepository credencialRepository;
     
-    // Método para validar que los campos obligatorios no sean nulos
-    private void validarCamposObligatorios(CredencialesDTO credencialDTO) throws CampoObligatorioException {
+    private void validarCamposObligatorios(CredencialesDTO credencialDTO) {
         if (credencialDTO.getSsid() == null) {
             throw new CampoObligatorioException("ssid");
         }
@@ -32,8 +30,7 @@ public class CredencialService {
         }
     }
     
-    // Método para validar que los campos no estén vacíos
-    private void validarCamposNoVacios(CredencialesDTO credencialDTO) throws CampoVacioException {
+    private void validarCamposNoVacios(CredencialesDTO credencialDTO) {
         if (credencialDTO.getSsid().trim().isEmpty()) {
             throw new CampoVacioException("ssid");
         }
@@ -45,15 +42,10 @@ public class CredencialService {
         }
     }
     
-    // Método para guardar una nueva red
-    public void guardarNuevaRed(CredencialesDTO credencialDTO) throws CampoObligatorioException, CampoVacioException {
-        // Validar que los campos no sean nulos
+    public void guardarNuevaRed(CredencialesDTO credencialDTO) {
         validarCamposObligatorios(credencialDTO);
-        
-        // Validar que los campos no estén vacíos
         validarCamposNoVacios(credencialDTO);
         
-        // Crear la entidad y guardarla
         CredencialEntity entidad = new CredencialEntity(
             credencialDTO.getSsid(),
             credencialDTO.getUsuario(),
@@ -64,12 +56,10 @@ public class CredencialService {
         credencialRepository.save(entidad);
     }
     
-    // Método para obtener todas las redes guardadas
     public List<ConfigDTO> obtenerTodasLasRedes() {
         List<CredencialEntity> redesGuardadas = credencialRepository.findAll();
         List<ConfigDTO> confList = new ArrayList<>();
         
-        // Convertir las entidades a DTOs
         for (CredencialEntity c : redesGuardadas) {
             ConfigDTO dto = new ConfigDTO(c.getSsid(), c.getUsuario(), c.getPassword(), c.getSeguridad());
             confList.add(dto);
