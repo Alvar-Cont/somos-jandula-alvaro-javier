@@ -8,7 +8,7 @@
         <div class="form-group">
           <label>SSID (Nombre de la red) *</label>
           <input 
-            v-model="nuevaRed.SSID" 
+            v-model="nuevaRed.ssid" 
             type="text" 
             placeholder="Ej: Andared_Corporativo"
             @keyup.enter="agregarRed"
@@ -16,9 +16,19 @@
         </div>
 
         <div class="form-group">
+          <label>Usuario *</label>
+          <input 
+            v-model="nuevaRed.usuario" 
+            type="text" 
+            placeholder="Usuario de la red"
+            @keyup.enter="agregarRed"
+          />
+        </div>
+
+        <div class="form-group">
           <label>Contraseña *</label>
           <input 
-            v-model="nuevaRed.contrasena" 
+            v-model="nuevaRed.password" 
             type="password" 
             placeholder="Contraseña de la red"
             @keyup.enter="agregarRed"
@@ -26,8 +36,9 @@
         </div>
 
         <div class="form-group">
-          <label>Configuración de Seguridad</label>
-          <select v-model="nuevaRed.configSeguridad">
+          <label>Configuración de Seguridad (Opcional)</label>
+          <select v-model="nuevaRed.seguridad">
+            <option value="">Sin especificar</option>
             <option value="WPA2">WPA2</option>
             <option value="WPA3">WPA3</option>
             <option value="WPA">WPA</option>
@@ -57,7 +68,9 @@
           <div class="network-header">
             <div class="network-info">
               <h3>{{ red.ssid }}</h3>
-              <p>🔒 Contraseña: {{ ocultarContrasena(red.contrasena) }}</p>
+              <p>� Usuario: {{ red.usuario }}</p>
+              <p>🔐 Contraseña: {{ ocultarContrasena(red.password) }}</p>
+              <p v-if="red.seguridad">🔒 Seguridad: {{ red.seguridad }}</p>
             </div>
             <span class="network-icon">📶</span>
           </div>
@@ -81,9 +94,10 @@ export default {
   data() {
     return {
       nuevaRed: {
-        SSID: '',
-        contrasena: '',
-        configSeguridad: 'WPA2'
+        ssid: '',
+        usuario: '',
+        password: '',
+        seguridad: ''
       },
       guardando: false,
       API_BASE: 'http://localhost:8084',
@@ -91,6 +105,7 @@ export default {
     }
   },
   methods: {
+    // Carga las redes desde el servidor
     cargarRedes() {
       try {
         fetch(`${this.API_BASE}/configuracion-redes`)
@@ -103,14 +118,16 @@ export default {
         console.log('Error:', error)
       }
     },
+    // Agrega una nueva red
     async agregarRed() {
-      // Validación
-      if (!this.nuevaRed.SSID || !this.nuevaRed.contrasena) {
-        alert('⚠️ Por favor completa todos los campos obligatorios')
+      // Validar campos obligatorios
+      if (!this.nuevaRed.ssid || !this.nuevaRed.usuario || !this.nuevaRed.password) {
+        alert('⚠️ SSID, Usuario y Contraseña son obligatorios')
         return
       }
 
-      if (this.nuevaRed.SSID.trim() === '' || this.nuevaRed.contrasena.trim() === '') {
+      // Validar que no estén vacíos
+      if (this.nuevaRed.ssid.trim() === '' || this.nuevaRed.usuario.trim() === '' || this.nuevaRed.password.trim() === '') {
         alert('⚠️ Los campos no pueden estar vacíos')
         return
       }
@@ -118,6 +135,7 @@ export default {
       try {
         this.guardando = true
         
+        // Hacer POST al servidor
         const response = await fetch(
           `${this.API_BASE}/configuracion-redes`,
           {
@@ -126,8 +144,10 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              SSID: this.nuevaRed.SSID,
-              contrasena: this.nuevaRed.contrasena
+              ssid: this.nuevaRed.ssid,
+              usuario: this.nuevaRed.usuario,
+              password: this.nuevaRed.password,
+              seguridad: this.nuevaRed.seguridad
             })
           }
         )
@@ -135,14 +155,15 @@ export default {
         if (response.ok) {
           alert('✅ Red agregada exitosamente')
           
-          // Limpiar formulario
+          // Limpiar el formulario
           this.nuevaRed = {
-            SSID: '',
-            contrasena: '',
-            configSeguridad: 'WPA2'
+            ssid: '',
+            usuario: '',
+            password: '',
+            seguridad: ''
           }
           
-          // Recargar lista
+          // Recargar la lista de redes
           this.cargarRedes()
         } else {
           alert('❌ Error al agregar la red')
@@ -154,11 +175,13 @@ export default {
         this.guardando = false
       }
     },
+    // Oculta la contraseña con puntos
     ocultarContrasena(contrasena) {
       if (!contrasena) return '••••••••'
       return '•'.repeat(contrasena.length)
     }
   },
+  // Al montar el componente, cargar las redes
   mounted() {
     this.cargarRedes()
   }

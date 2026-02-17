@@ -1,38 +1,37 @@
 package com.escaneoRedes.Escaneo.Redes.controllers;
 
 import com.escaneoRedes.Escaneo.Redes.dto.TelemetriaDTO;
+import com.escaneoRedes.Escaneo.Redes.exceptions.CampoObligatorioException;
 import com.escaneoRedes.Escaneo.Redes.models.TelemetriaEntity;
-import com.escaneoRedes.Escaneo.Redes.repositories.TelemetriaRepository;
+import com.escaneoRedes.Escaneo.Redes.services.TelemetriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Controlador para el historial de estados (telemetría)
 @RestController
 public class RedesController {
 
     @Autowired
-    private TelemetriaRepository telemetriaRepository;
+    private TelemetriaService telemetriaService;
 
+    // POST para registrar un nuevo reporte
     @PostMapping("/registros-redes")
     public ResponseEntity<?> nuevaRed(@RequestBody TelemetriaDTO td) {
-        if (td.getSSID() == null || td.getEstado() == null || td.getTimestamp() == null) {
-            return ResponseEntity.status(400).body("Valor no añadido");
+        try {
+            telemetriaService.guardarTelemetria(td);
+            return ResponseEntity.ok().build();
+        } catch (CampoObligatorioException e) {
+            return ResponseEntity.status(400).body(e.getMensaje());
         }
-        if (td.getSSID().equalsIgnoreCase("")) {
-            return ResponseEntity.status(400).body("Valor vacío");
-        }
-
-        TelemetriaEntity entidad = new TelemetriaEntity(td.getSSID(), td.getEstado(), td.getTimestamp());
-        telemetriaRepository.save(entidad);
-
-        return ResponseEntity.ok().build();
     }
 
+    // GET para obtener el historial
     @GetMapping("/registros-redes")
     public ResponseEntity<?> listadoHistorico() {
-        List<TelemetriaEntity> historico = telemetriaRepository.findAll();
+        List<TelemetriaEntity> historico = telemetriaService.obtenerTodoElHistorial();
         return ResponseEntity.ok().body(historico);
     }
 }

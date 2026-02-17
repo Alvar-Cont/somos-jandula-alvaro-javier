@@ -2,24 +2,39 @@ package com.escaneoRedes.Escaneo.Redes.models;
 
 import jakarta.persistence.*;
 
+// Entidad para almacenar las redes que hay que auditar
 @Entity
-@Table(name = "credenciales")
+@Table(name = "redes")
 public class CredencialEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Nombre de la red wifi
     private String ssid;
-    private String contrasena;
+    
+    // Usuario para acceder a la red
+    private String usuario;
+    
+    // Contraseña de la red
+    private String password;
+    
+    // Tipo de seguridad (WPA2, WPA3, etc)
+    private String seguridad;
 
+    // Constructor vacío requerido por JPA
     public CredencialEntity() {}
 
-    public CredencialEntity(String ssid, String contrasena) {
+    // Constructor con todos los parámetros
+    public CredencialEntity(String ssid, String usuario, String password, String seguridad) {
         this.ssid = ssid;
-        this.contrasena = contrasena;
+        this.usuario = usuario;
+        this.password = password;
+        this.seguridad = seguridad;
     }
 
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -36,11 +51,27 @@ public class CredencialEntity {
         this.ssid = ssid;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getUsuario() {
+        return usuario;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSeguridad() {
+        return seguridad;
+    }
+
+    public void setSeguridad(String seguridad) {
+        this.seguridad = seguridad;
     }
 }

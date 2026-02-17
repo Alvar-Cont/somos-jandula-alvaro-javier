@@ -34,7 +34,7 @@
           </div>
           <div class="status-timestamp">
             <p>🕐 Última actualización:</p>
-            <p>{{ formatearFecha(item.timestamp) }}</p>
+            <p>{{ formatearFecha(item.fechaReporte) }}</p>
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@
                   {{ obtenerTextoEstado(item.estado) }}
                 </span>
               </td>
-              <td class="timestamp">{{ formatearFecha(item.timestamp) }}</td>
+              <td class="timestamp">{{ formatearFecha(item.fechaReporte) }}</td>
             </tr>
           </tbody>
         </table>
@@ -97,7 +97,7 @@ export default {
       const ultimasPorSSID = {}
       this.telemetria.forEach(item => {
         if (!ultimasPorSSID[item.ssid] || 
-            new Date(item.timestamp) > new Date(ultimasPorSSID[item.ssid].timestamp)) {
+            new Date(item.fechaReporte) > new Date(ultimasPorSSID[item.ssid].fechaReporte)) {
           ultimasPorSSID[item.ssid] = item
         }
       })
@@ -105,7 +105,7 @@ export default {
     },
     telemetriaOrdenada() {
       return [...this.telemetria].sort((a, b) => 
-        new Date(b.timestamp) - new Date(a.timestamp)
+        new Date(b.fechaReporte) - new Date(a.fechaReporte)
       )
     }
   },

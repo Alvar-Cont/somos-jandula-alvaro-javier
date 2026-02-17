@@ -1,40 +1,54 @@
 package com.escaneoRedes.Escaneo.Redes.dto;
 
 public class CredencialesDTO {
-    private String SSID;
-    private String contrasena;
-    private String configSeguridad;
+    
+    private String ssid;
+    private String usuario;
+    private String password;
+    private String seguridad;
 
+    // Constructor vacío
     public CredencialesDTO() {
     }
 
-    public CredencialesDTO(String SSID, String contrasena, String configSeguridad) {
-        this.SSID = SSID;
-        this.contrasena = contrasena;
-        this.configSeguridad = configSeguridad;
+    // Constructor con parámetros
+    public CredencialesDTO(String ssid, String usuario, String password, String seguridad) {
+        this.ssid = ssid;
+        this.usuario = usuario;
+        this.password = password;
+        this.seguridad = seguridad;
     }
 
-    public String getSSID() {
-        return SSID;
+    // Getters
+    public String getSsid() {
+        return ssid;
     }
 
-    public void setSSID(String SSID) {
-        this.SSID = SSID;
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getUsuario() {
+        return usuario;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
-    public String getConfigSeguridad() {
-        return configSeguridad;
+    public String getPassword() {
+        return password;
     }
 
-    public void setConfigSeguridad(String configSeguridad) {
-        configSeguridad = configSeguridad;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSeguridad() {
+        return seguridad;
+    }
+
+    public void setSeguridad(String seguridad) {
+        this.seguridad = seguridad;
     }
 }

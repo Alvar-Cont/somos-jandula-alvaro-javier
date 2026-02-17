@@ -1,42 +1,44 @@
 package com.escaneoRedes.Escaneo.Redes.dto;
 
-import com.escaneoRedes.Escaneo.Redes.Estado;
-import java.sql.Timestamp;
-
 public class TelemetriaDTO {
-    private String SSID;
-    private Estado estado;
-    private String timestamp;
+    
+    private String ssid;
+    private String estado;
+    private String fechaReporte;
 
+    // Constructor vacío
     public TelemetriaDTO() {
     }
 
-    public TelemetriaDTO(String SSID, Estado estado, String timestamp) {
-        this.SSID = SSID;
+    // Constructor con parámetros
+    public TelemetriaDTO(String ssid, String estado, String fechaReporte) {
+        this.ssid = ssid;
         this.estado = estado;
-        this.timestamp = timestamp;
+        this.fechaReporte = fechaReporte;
     }
 
-    public String getSSID() {
-        return SSID;
+    // Getters y Setters
+    public String getSsid() {
+        return ssid;
     }
 
-    public void setSSID(String SSID) {
-        this.SSID = SSID;
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
     }
 
-    public Estado getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(Estado estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getFechaReporte() {
+        return fechaReporte;
     }
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+
+    public void setFechaReporte(String fechaReporte) {
+        this.fechaReporte = fechaReporte;
     }
 }

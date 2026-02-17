@@ -34,7 +34,7 @@
           </div>
           <div class="status-timestamp">
             <p>🕐 Última actualización:</p>
-            <p>{{ formatearFecha(item.timestamp) }}</p>
+            <p>{{ formatearFecha(item.fechaReporte) }}</p>
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@
                   {{ obtenerTextoEstado(item.estado) }}
                 </span>
               </td>
-              <td class="timestamp">{{ formatearFecha(item.timestamp) }}</td>
+              <td class="timestamp">{{ formatearFecha(item.fechaReporte) }}</td>
             </tr>
           </tbody>
         </table>
@@ -79,29 +79,32 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      telemetria: [],
-      cargando: true,
-      estadoExpandido: false
+      telemetria: [],  // Array con todos los registros de telemetría
+      cargando: true,  // Flag para mostrar estado de carga
+      estadoExpandido: false  // Flag para expandir/contraer vista
     }
   },
   computed: {
+    // Calcula la última telemetría por cada SSID
     ultimasTelemetrias() {
       const ultimasPorSSID = {}
       this.telemetria.forEach(item => {
         if (!ultimasPorSSID[item.ssid] || 
-            new Date(item.timestamp) > new Date(ultimasPorSSID[item.ssid].timestamp)) {
+            new Date(item.fechaReporte) > new Date(ultimasPorSSID[item.ssid].fechaReporte)) {
           ultimasPorSSID[item.ssid] = item
         }
       })
       return Object.values(ultimasPorSSID)
     },
+    // Ordena la telemetría por fecha descendente
     telemetriaOrdenada() {
       return [...this.telemetria].sort((a, b) => 
-        new Date(b.timestamp) - new Date(a.timestamp)
+        new Date(b.fechaReporte) - new Date(a.fechaReporte)
       )
     }
   },
   methods: {
+    // Carga los registros de telemetría del servidor
     cargarTelemetria() {
       this.cargando = true
       try {
@@ -120,6 +123,7 @@ export default {
         this.cargando = false
       }
     },
+    // Devuelve la clase CSS según el estado
     obtenerClaseEstado(estado) {
       const clases = {
         'Conectado': 'conectado',

@@ -24,26 +24,28 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `credenciales`
+-- Estructura de tabla para la tabla `redes`
 --
 
-CREATE TABLE `credenciales` (
+CREATE TABLE `redes` (
   `id` bigint(20) NOT NULL,
-  `contrasena` varchar(255) DEFAULT NULL,
-  `ssid` varchar(255) DEFAULT NULL
+  `ssid` varchar(255) NOT NULL,
+  `usuario` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `seguridad` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `telemetria`
+-- Estructura de tabla para la tabla `historial_estados`
 --
 
-CREATE TABLE `telemetria` (
+CREATE TABLE `historial_estados` (
   `id` bigint(20) NOT NULL,
-  `estado` enum('Conectado','FalloDeAuth','SinSenal') DEFAULT NULL,
-  `ssid` varchar(255) DEFAULT NULL,
-  `timestamp` varchar(255) DEFAULT NULL
+  `ssid` varchar(255) NOT NULL,
+  `estado` enum('Conectado','FalloDeAuth','SinSenal') NOT NULL,
+  `fecha_reporte` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -51,15 +53,15 @@ CREATE TABLE `telemetria` (
 --
 
 --
--- Indices de la tabla `credenciales`
+-- Indices de la tabla `redes`
 --
-ALTER TABLE `credenciales`
+ALTER TABLE `redes`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `telemetria`
+-- Indices de la tabla `historial_estados`
 --
-ALTER TABLE `telemetria`
+ALTER TABLE `historial_estados`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -67,15 +69,15 @@ ALTER TABLE `telemetria`
 --
 
 --
--- AUTO_INCREMENT de la tabla `credenciales`
+-- AUTO_INCREMENT de la tabla `redes`
 --
-ALTER TABLE `credenciales`
+ALTER TABLE `redes`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `telemetria`
+-- AUTO_INCREMENT de la tabla `historial_estados`
 --
-ALTER TABLE `telemetria`
+ALTER TABLE `historial_estados`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

@@ -1,30 +1,54 @@
 package com.escaneoRedes.Escaneo.Redes.dto;
 
 public class ConfigDTO {
-    private String SSID;
-    private String contrasena;
+    
+    private String ssid;
+    private String usuario;
+    private String password;
+    private String seguridad;
 
+    // Constructor vacío
     public ConfigDTO() {
     }
 
-    public ConfigDTO(String SSID, String contrasena) {
-        this.SSID = SSID;
-        this.contrasena = contrasena;
+    // Constructor con todos los parámetros
+    public ConfigDTO(String ssid, String usuario, String password, String seguridad) {
+        this.ssid = ssid;
+        this.usuario = usuario;
+        this.password = password;
+        this.seguridad = seguridad;
     }
 
-    public String getSSID() {
-        return SSID;
+    // Getters y Setters
+    public String getSsid() {
+        return ssid;
     }
 
-    public void setSSID(String SSID) {
-        this.SSID = SSID;
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getUsuario() {
+        return usuario;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSeguridad() {
+        return seguridad;
+    }
+
+    public void setSeguridad(String seguridad) {
+        this.seguridad = seguridad;
     }
 }

@@ -5,7 +5,7 @@
       
       <div class="form">
         <div class="form-group">
-          <label>🌐 SSID (Nombre de la red)</label>
+          <label>🌐 SSID (Nombre de la red) *</label>
           <input 
             v-model="nuevaRed.ssid" 
             type="text" 
@@ -15,13 +15,35 @@
         </div>
 
         <div class="form-group">
-          <label>🔐 Contraseña</label>
+          <label>👤 Usuario *</label>
           <input 
-            v-model="nuevaRed.contrasena" 
+            v-model="nuevaRed.usuario" 
+            type="text" 
+            placeholder="Usuario de la red"
+            class="input-field"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>🔐 Contraseña *</label>
+          <input 
+            v-model="nuevaRed.password" 
             type="password" 
             placeholder="Contraseña de la red"
             class="input-field"
           />
+        </div>
+
+        <div class="form-group">
+          <label>🔒 Seguridad (Opcional)</label>
+          <select v-model="nuevaRed.seguridad" class="input-field">
+            <option value="">Sin especificar</option>
+            <option value="WPA2">WPA2</option>
+            <option value="WPA3">WPA3</option>
+            <option value="WPA">WPA</option>
+            <option value="WEP">WEP</option>
+            <option value="Abierta">Abierta</option>
+          </select>
         </div>
 
         <button @click="agregarRed" :disabled="guardando" class="btn btn-primary btn-block">
@@ -48,7 +70,9 @@
           <div class="network-header">
             <div class="network-info">
               <h3>{{ red.ssid }}</h3>
-              <p class="network-password">🔒 {{ ocultarContrasena(red.contrasena) }}</p>
+              <p class="network-user">👤 {{ red.usuario }}</p>
+              <p class="network-password">🔐 {{ ocultarContrasena(red.password) }}</p>
+              <p v-if="red.seguridad" class="network-security">🔒 {{ red.seguridad }}</p>
             </div>
             <span class="network-icon">📶</span>
           </div>
@@ -68,16 +92,20 @@ export default {
   name: 'Administracion',
   data() {
     return {
+      // Datos del formulario para agregar una nueva red
       nuevaRed: {
         ssid: '',
-        contrasena: ''
+        usuario: '',
+        password: '',
+        seguridad: ''
       },
-      redes: [],
-      guardando: false,
-      cargando: true
+      redes: [],  // Lista de redes cargadas del servidor
+      guardando: false,  // Flag para deshabilitar botón mientras se guarda
+      cargando: true  // Flag para mostrar "cargando..." al iniciar
     }
   },
   methods: {
+    // Carga la lista de redes desde el servidor
     cargarRedes() {
       this.cargando = true
       try {
@@ -96,13 +124,16 @@ export default {
         this.cargando = false
       }
     },
+    // Agrega una nueva red al servidor
     async agregarRed() {
-      if (!this.nuevaRed.ssid || !this.nuevaRed.contrasena) {
-        alert('⚠️ Por favor completa todos los campos')
+      // Validar que los campos obligatorios estén llenos
+      if (!this.nuevaRed.ssid || !this.nuevaRed.usuario || !this.nuevaRed.password) {
+        alert('⚠️ SSID, Usuario y Contraseña son obligatorios')
         return
       }
 
-      if (this.nuevaRed.ssid.trim() === '' || this.nuevaRed.contrasena.trim() === '') {
+      // Validar que no estén vacíos
+      if (this.nuevaRed.ssid.trim() === '' || this.nuevaRed.usuario.trim() === '' || this.nuevaRed.password.trim() === '') {
         alert('⚠️ Los campos no pueden estar vacíos')
         return
       }
@@ -110,6 +141,7 @@ export default {
       try {
         this.guardando = true
         
+        // Enviar POST al servidor
         const response = await fetch('http://localhost:8084/configuracion-redes', {
           method: 'POST',
           headers: {
@@ -120,10 +152,16 @@ export default {
 
         if (response.ok) {
           alert('✅ Red agregada exitosamente')
+          
+          // Limpiar el formulario
           this.nuevaRed = {
             ssid: '',
-            contrasena: ''
+            usuario: '',
+            password: '',
+            seguridad: ''
           }
+          
+          // Recargar la lista
           this.cargarRedes()
         } else {
           alert('❌ Error al agregar la red')
@@ -135,33 +173,13 @@ export default {
         this.guardando = false
       }
     },
-    // Método comentado: requiere endpoint DELETE en el backend
-    /*
-    eliminarRed(index) {
-      if (confirm('¿Estás seguro de que quieres eliminar esta red?')) {
-        const red = this.redes[index]
-        try {
-          fetch(`http://localhost:8084/configuracion-redes/${red.id}`, {
-            method: 'DELETE'
-          })
-          .then(res => {
-            if (res.ok) {
-              alert('✅ Red eliminada exitosamente')
-              this.cargarRedes()
-            }
-          })
-          .catch(err => console.log('Error:', err))
-        } catch (error) {
-          console.log('Error:', error)
-        }
-      }
-    },
-    */
+    // Oculta la contraseña mostrando puntos
     ocultarContrasena(contrasena) {
       if (!contrasena) return '••••••••'
       return '•'.repeat(Math.min(contrasena.length, 8))
     }
   },
+  // Al cargar el componente, obtener la lista de redes
   mounted() {
     this.cargarRedes()
   }
