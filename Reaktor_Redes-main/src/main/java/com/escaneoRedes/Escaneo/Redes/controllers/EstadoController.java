@@ -17,7 +17,7 @@ public class EstadoController {
     @Autowired
     private CredencialRepository credencialRepository;
 
-    @PostMapping("/gestionCredenciales")
+    @PostMapping("/configuracion-redes")
     public ResponseEntity<?> nuevaRed(@RequestBody CredencialesDTO cdto){
         if (cdto.getSSID() == null || cdto.getContrasena() == null){
             return ResponseEntity.status(404).body("Valor no añadido");
@@ -32,7 +32,7 @@ public class EstadoController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/configRed")
+    @GetMapping("/configuracion-redes")
     public ResponseEntity<?> listadoConfig(){
         List<CredencialEntity> redesGuardadas = credencialRepository.findAll();
         List<ConfigDTO> confList = new ArrayList<>();

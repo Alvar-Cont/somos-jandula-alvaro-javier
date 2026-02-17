@@ -84,7 +84,7 @@ export default {
     async cargarTelemetria() {
       try {
         this.loading = true
-        const response = await axios.get(`${this.API_BASE}/consultaHistorico`)
+        const response = await axios.get(`${this.API_BASE}/registros-redes`)
         this.telemetria = response.data
       } catch (error) {
         console.error('Error al cargar telemetría:', error)
@@ -95,7 +95,7 @@ export default {
     },
     async cargarRedes() {
       try {
-        const response = await axios.get(`${this.API_BASE}/configRed`)
+        const response = await axios.get(`${this.API_BASE}/configuracion-redes`)
         this.redes = response.data
       } catch (error) {
         console.error('Error al cargar redes:', error)

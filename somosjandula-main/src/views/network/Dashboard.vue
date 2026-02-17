@@ -105,7 +105,7 @@ export default {
     cargarTelemetria() {
       this.cargando = true
       try {
-        fetch('http://localhost:8084/consultaHistorico')
+        fetch('http://localhost:8084/registros-redes')
           .then(res => res.json())
           .then(data => {
             this.telemetria = Array.isArray(data) ? data : []

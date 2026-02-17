@@ -52,9 +52,11 @@
             </div>
             <span class="network-icon">📶</span>
           </div>
+          <!-- Funcionalidad de eliminar comentada: endpoint DELETE no disponible en backend
           <button @click="eliminarRed(index)" class="btn btn-danger btn-small">
             🗑️ Eliminar
           </button>
+          -->
         </div>
       </div>
     </div>
@@ -79,7 +81,7 @@ export default {
     cargarRedes() {
       this.cargando = true
       try {
-        fetch('http://localhost:8084/api/credenciales')
+        fetch('http://localhost:8084/configuracion-redes')
           .then(res => res.json())
           .then(data => {
             this.redes = Array.isArray(data) ? data : []
@@ -108,7 +110,7 @@ export default {
       try {
         this.guardando = true
         
-        const response = await fetch('http://localhost:8084/api/credenciales', {
+        const response = await fetch('http://localhost:8084/configuracion-redes', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -133,11 +135,13 @@ export default {
         this.guardando = false
       }
     },
+    // Método comentado: requiere endpoint DELETE en el backend
+    /*
     eliminarRed(index) {
       if (confirm('¿Estás seguro de que quieres eliminar esta red?')) {
         const red = this.redes[index]
         try {
-          fetch(`http://localhost:8084/api/credenciales/${red.id}`, {
+          fetch(`http://localhost:8084/configuracion-redes/${red.id}`, {
             method: 'DELETE'
           })
           .then(res => {
@@ -152,6 +156,7 @@ export default {
         }
       }
     },
+    */
     ocultarContrasena(contrasena) {
       if (!contrasena) return '••••••••'
       return '•'.repeat(Math.min(contrasena.length, 8))

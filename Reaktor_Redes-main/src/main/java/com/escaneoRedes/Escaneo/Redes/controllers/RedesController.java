@@ -15,7 +15,7 @@ public class RedesController {
     @Autowired
     private TelemetriaRepository telemetriaRepository;
 
-    @PostMapping("/RegistroTelemetria")
+    @PostMapping("/registros-redes")
     public ResponseEntity<?> nuevaRed(@RequestBody TelemetriaDTO td) {
         if (td.getSSID() == null || td.getEstado() == null || td.getTimestamp() == null) {
             return ResponseEntity.status(400).body("Valor no añadido");
@@ -30,7 +30,7 @@ public class RedesController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/consultaHistorico")
+    @GetMapping("/registros-redes")
     public ResponseEntity<?> listadoHistorico() {
         List<TelemetriaEntity> historico = telemetriaRepository.findAll();
         return ResponseEntity.ok().body(historico);

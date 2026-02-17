@@ -102,14 +102,14 @@ export default {
   methods: {
     cargarDatos() {
       try {
-        fetch('http://localhost:8084/configRed')
+        fetch('http://localhost:8084/configuracion-redes')
           .then(res => res.json())
           .then(data => {
             this.redes = Array.isArray(data) ? data : []
           })
           .catch(err => console.log('Error:', err))
         
-        fetch('http://localhost:8084/consultaHistorico')
+        fetch('http://localhost:8084/registros-redes')
           .then(res => res.json())
           .then(data => {
             this.telemetria = Array.isArray(data) ? data : []

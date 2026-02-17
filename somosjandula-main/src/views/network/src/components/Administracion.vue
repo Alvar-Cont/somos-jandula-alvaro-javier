@@ -106,7 +106,7 @@ export default {
         this.guardando = true
         
         const response = await axios.post(
-          `${this.API_BASE}/gestionCredenciales`,
+          `${this.API_BASE}/configuracion-redes`,
           this.nuevaRed
         )
 

@@ -673,7 +673,7 @@ const ultimasTelemetrias = computed(() => {
 
 const cargarTelemetria = () => {
   try {
-    fetch('http://localhost:8084/consultaHistorico')
+    fetch('http://localhost:8084/registros-redes')
       .then(res => res.json())
       .then(data => {
         telemetria.value = Array.isArray(data) ? data : []

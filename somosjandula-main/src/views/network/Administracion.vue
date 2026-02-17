@@ -93,7 +93,7 @@ export default {
   methods: {
     cargarRedes() {
       try {
-        fetch(`${this.API_BASE}/configRed`)
+        fetch(`${this.API_BASE}/configuracion-redes`)
           .then(res => res.json())
           .then(data => {
             this.redes = Array.isArray(data) ? data : []
@@ -119,7 +119,7 @@ export default {
         this.guardando = true
         
         const response = await fetch(
-          `${this.API_BASE}/gestionCredenciales`,
+          `${this.API_BASE}/configuracion-redes`,
           {
             method: 'POST',
             headers: {
