@@ -3,7 +3,7 @@
     <!-- Estado Actual -->
     <div :class="['card', { 'card-fullscreen': estadoExpandido }]">
       <div class="card-header-flex">
-        <h2 class="card-title">📡 Estado Actual de Redes</h2>
+        <h2 class="card-title"> Estado Actual de Redes</h2>
         <button @click="estadoExpandido = !estadoExpandido" class="btn-expandir">
           {{ estadoExpandido ? '🔽 Minimizar' : '🔼 Expandir' }}
         </button>
@@ -42,7 +42,7 @@
 
     <!-- Histórico Completo -->
     <div v-if="!estadoExpandido" class="card">
-      <h2 class="card-title">📋 Histórico Completo</h2>
+      <h2 class="card-title">Histórico Completo</h2>
       
       <div v-if="telemetria.length === 0" class="empty-state">
         <p>No hay registros en el histórico</p>

@@ -5,7 +5,7 @@
       
       <div class="form">
         <div class="form-group">
-          <label>🌐 SSID (Nombre de la red) *</label>
+          <label>SSID (Nombre de la red) *</label>
           <input 
             v-model="nuevaRed.ssid" 
             type="text" 
@@ -15,7 +15,7 @@
         </div>
 
         <div class="form-group">
-          <label>👤 Usuario *</label>
+          <label>Usuario *</label>
           <input 
             v-model="nuevaRed.usuario" 
             type="text" 
@@ -25,7 +25,7 @@
         </div>
 
         <div class="form-group">
-          <label>🔐 Contraseña *</label>
+          <label>Contraseña *</label>
           <input 
             v-model="nuevaRed.password" 
             type="password" 
@@ -35,7 +35,7 @@
         </div>
 
         <div class="form-group">
-          <label>🔒 Seguridad (Opcional)</label>
+          <label>Seguridad (Opcional)</label>
           <select v-model="nuevaRed.seguridad" class="input-field">
             <option value="">Sin especificar</option>
             <option value="WPA2">WPA2</option>
@@ -47,7 +47,7 @@
         </div>
 
         <button @click="agregarRed" :disabled="guardando" class="btn btn-primary btn-block">
-          <span v-if="guardando">⏳ Guardando...</span>
+          <span v-if="guardando">Guardando...</span>
           <span v-else>➕ Agregar Red</span>
         </button>
       </div>
@@ -57,11 +57,11 @@
       <h2 class="card-title">🌐 Redes Configuradas</h2>
       
       <div v-if="cargando" class="loading">
-        <p>⏳ Cargando redes...</p>
+        <p>Cargando redes...</p>
       </div>
       
       <div v-else-if="redes.length === 0" class="empty-state">
-        <p>❌ No hay redes configuradas</p>
+        <p>No hay redes configuradas</p>
         <p class="text-small">Agrega una red usando el formulario de arriba</p>
       </div>
 
@@ -70,9 +70,9 @@
           <div class="network-header">
             <div class="network-info">
               <h3>{{ red.ssid }}</h3>
-              <p class="network-user">👤 {{ red.usuario }}</p>
-              <p class="network-password">🔐 {{ ocultarContrasena(red.password) }}</p>
-              <p v-if="red.seguridad" class="network-security">🔒 {{ red.seguridad }}</p>
+              <p class="network-user">{{ red.usuario }}</p>
+              <p class="network-password">{{ ocultarContrasena(red.password) }}</p>
+              <p v-if="red.seguridad" class="network-security">{{ red.seguridad }}</p>
             </div>
             <span class="network-icon">📶</span>
           </div>

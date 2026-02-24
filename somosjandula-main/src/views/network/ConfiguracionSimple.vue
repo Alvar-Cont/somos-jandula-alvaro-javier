@@ -1,10 +1,10 @@
 <template>
   <div class="configuracion">
     <div class="card">
-      <h2 class="card-title">⚙️ Configuración del Sistema</h2>
+      <h2 class="card-title">Configuración del Sistema</h2>
       
       <div class="config-section">
-        <h3>🔄 Actualización Automática</h3>
+        <h3>Actualización Automática</h3>
         <label class="switch">
           <input v-model="autoRefresh" type="checkbox" />
           <span class="slider"></span>
@@ -13,7 +13,7 @@
       </div>
 
       <div class="config-section">
-        <h3>⏱️ Intervalo de Refresco</h3>
+        <h3>Intervalo de Refresco</h3>
         <div class="slider-container">
           <input 
             v-model.number="refreshInterval" 
@@ -28,39 +28,29 @@
         <p class="description">Los datos se actualizarán cada {{ refreshInterval }} segundos</p>
       </div>
 
-      <div class="config-section">
-        <h3>🎨 Tema</h3>
-        <select v-model="tema" class="select-input">
-          <option value="light">Claro</option>
-          <option value="dark">Oscuro</option>
-          <option value="auto">Automático</option>
-        </select>
-        <p class="description">Selecciona el tema de la interfaz</p>
-      </div>
-
       <button @click="guardarConfiguracion" class="btn btn-primary">
-        💾 Guardar Configuración
+        Guardar Configuración
       </button>
     </div>
 
     <div class="card">
-      <h2 class="card-title">ℹ️ Información del Sistema</h2>
+      <h2 class="card-title">Información del Sistema</h2>
       
       <div class="info-grid">
         <div class="info-item">
-          <span class="info-label">🔗 API Backend:</span>
+          <span class="info-label">API Backend:</span>
           <span class="info-value">http://localhost:8084</span>
         </div>
         <div class="info-item">
-          <span class="info-label">🗄️ Base de Datos:</span>
+          <span class="info-label">Base de Datos:</span>
           <span class="info-value">redes_db (MySQL)</span>
         </div>
         <div class="info-item">
-          <span class="info-label">📱 Frontend:</span>
+          <span class="info-label">Frontend:</span>
           <span class="info-value">Vue 3 + Vite</span>
         </div>
         <div class="info-item">
-          <span class="info-label">🔐 Autenticación:</span>
+          <span class="info-label">Autenticación:</span>
           <span class="info-value">JWT Token</span>
         </div>
       </div>
