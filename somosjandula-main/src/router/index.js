@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { ref } from 'vue';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { obtenerRolesUsuario } from '@/services/firebaseService';
+import { SESSION_JWT_TOKEN } from '@/utils/constants';
 
 import LoginPage from '@/views/LoginPage.vue';
 import MainLayout from '@/components/MainLayout.vue';
@@ -384,7 +385,8 @@ const routes = [
         component: NetworkScannerView,
         name: 'NetworkScanner',
         meta: {
-          role: 'PROFESOR'
+          requiresAuth: true,
+          denyIfOnlyRole: 'PROFESOR'
         },
       },
       {
@@ -417,7 +419,16 @@ router.beforeEach(async (to, from, next) => {
     user = await waitForAuthReady(auth); // Espera a que Firebase termine de inicializar el estado de autenticación
   }
 
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
+  const requiredRole = to.meta.role;
+  const requiredRoles = Array.isArray(to.meta.roles) ? to.meta.roles : null;
+  const forbiddenRoles = Array.isArray(to.meta.forbiddenRoles) ? to.meta.forbiddenRoles : null;
+  const requiresAuth =
+    to.matched.some((record) => record.meta.requiresAuth) ||
+    Boolean(requiredRole) ||
+    Boolean(requiredRoles && requiredRoles.length > 0) ||
+    Boolean(forbiddenRoles && forbiddenRoles.length > 0);
+
+  if (requiresAuth) {
     if (!user) {
       return next({ name: 'Login' });
     }
@@ -427,10 +438,28 @@ router.beforeEach(async (to, from, next) => {
       const toastMessage = ref('');
       const toastColor = ref('success');
 
-      const userRoles = await obtenerRolesUsuario(toastMessage, toastColor, isToastOpen); // Obtiene los roles del usuario
-      const requiredRole = to.meta.role;
+      sessionStorage.removeItem(SESSION_JWT_TOKEN);
+      const rolesRaw = await obtenerRolesUsuario(toastMessage, toastColor, isToastOpen); // Obtiene los roles del usuario
+      const userRoles = Array.isArray(rolesRaw)
+        ? rolesRaw.map((role) => String(role).trim().toUpperCase()).filter(Boolean)
+        : [];
+      const denyIfOnlyRole = to.meta.denyIfOnlyRole ? String(to.meta.denyIfOnlyRole).trim().toUpperCase() : null;
 
-      // Si la ruta requiere un rol específico y el usuario no lo tiene, redirige a Login o muestra un error.
+      if (denyIfOnlyRole && userRoles.length === 1 && userRoles.includes(denyIfOnlyRole)) {
+        return next({ name: 'AccessDenied' });
+      }
+
+      // Si la ruta define roles prohibidos y el usuario tiene alguno, deniega.
+      if (forbiddenRoles && forbiddenRoles.some((role) => userRoles.includes(role))) {
+        return next({ name: 'AccessDenied' });
+      }
+
+      // Si la ruta define varios roles posibles, basta con tener uno.
+      if (requiredRoles && !requiredRoles.some((role) => userRoles.includes(role))) {
+        return next({ name: 'AccessDenied' });
+      }
+
+      // Si la ruta requiere un rol específico y el usuario no lo tiene, redirige a acceso denegado.
       if (requiredRole && !userRoles.includes(requiredRole)) {
         return next({ name: 'AccessDenied' });
       }

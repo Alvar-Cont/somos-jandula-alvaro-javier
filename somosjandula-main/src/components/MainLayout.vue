@@ -92,7 +92,7 @@
               Estadísticas
               <ion-icon slot="end" name="bar-chart"></ion-icon>
             </ion-item>
-            <ion-item button @click="navigateAndCloseMenu('/network/scanner')">
+            <ion-item v-if="mostrarNetworkScanner" button @click="navigateAndCloseMenu('/network/scanner')">
               Escaneo de redes
               <ion-icon slot="end" name="search"></ion-icon>
             </ion-item>
@@ -233,7 +233,7 @@ import { defineComponent, ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { menuController } from "@ionic/vue";
 import { getAuth, signOut } from "firebase/auth";
-import { validarRolesMenu, obtenerNombreYApellidosUsuario } from "@/services/firebaseService";
+import { validarRolesMenu, obtenerNombreYApellidosUsuario, obtenerRolesUsuario } from "@/services/firebaseService";
 import { SESSION_JWT_TOKEN } from "@/utils/constants";
 import { obtenerNotificacionesVigentesPorTipo } from "@/services/notifications";
 
@@ -263,6 +263,7 @@ export default defineComponent({
     const mostrarTimetableAdmin = ref(false);
     const mostrarTimetableTeachers = ref(false);
     const mostrarSchoolManager = ref(false);
+    const mostrarNetworkScanner = ref(false);
 
     const adminSubmenuVisible = ref(false);
     const timetableAdminSubmenuVisible = ref(false);
@@ -274,6 +275,13 @@ export default defineComponent({
     const absencesSubmenuVisible = ref(false);
 
     const issuesSubmenuVisible = ref(false);
+
+    const normalizarRoles = (roles) => {
+      if (!Array.isArray(roles)) {
+        return [];
+      }
+      return roles.map(role => String(role).trim().toUpperCase()).filter(Boolean);
+    };
 
     // Variables para el toast
     const isToastOpen = ref(false);
@@ -331,6 +339,13 @@ export default defineComponent({
           mostrarAdmin.value = rolesMenu.mostrarAdmin;
           mostrarTimetableAdmin.value = rolesMenu.mostrarDireccion;
           mostrarSchoolManager.value = rolesMenu.mostrarDireccion;
+          sessionStorage.removeItem(SESSION_JWT_TOKEN);
+          return obtenerRolesUsuario(toastMessage, toastColor, isToastOpen);
+        })
+        .then((rolesUsuario) => {
+          const rolesNormalizados = normalizarRoles(rolesUsuario);
+          const esSoloProfesor = rolesNormalizados.length === 1 && rolesNormalizados.includes('PROFESOR');
+          mostrarNetworkScanner.value = !esSoloProfesor;
         })
         .catch((error) => {
           console.error(error);
@@ -468,13 +483,18 @@ export default defineComponent({
         const userInfo = await obtenerNombreYApellidosUsuario(toastMessage, toastColor, isToastOpen);
         userName.value = userInfo.nombre;
 
-        const rolesMenu = await validarRolesMenu(isToastOpen, toastMessage, toastColor);
+        const rolesMenu = await validarRolesMenu(toastMessage, toastColor, isToastOpen);
+        sessionStorage.removeItem(SESSION_JWT_TOKEN);
+        const rolesUsuario = await obtenerRolesUsuario(toastMessage, toastColor, isToastOpen);
+        const rolesNormalizados = normalizarRoles(rolesUsuario);
+        const esSoloProfesor = rolesNormalizados.length === 1 && rolesNormalizados.includes('PROFESOR');
 
         mostrarAdmin.value = rolesMenu.mostrarDireccion;
         mostrarAdminFirebase.value = rolesMenu.mostrarAdmin;
         mostrarTimetableAdmin.value = rolesMenu.mostrarDireccion;
         mostrarTimetableTeachers.value = rolesMenu.mostrarDireccion;
         mostrarSchoolManager.value = rolesMenu.mostrarDireccion;
+        mostrarNetworkScanner.value = !esSoloProfesor;
       }
       catch (error) {
         crearToast(
@@ -495,6 +515,7 @@ export default defineComponent({
       mostrarAdmin,
       mostrarAdminFirebase,
       mostrarSchoolManager,
+      mostrarNetworkScanner,
       mostrarTimetableAdmin,
       mostrarTimetableTeachers,
       adminSubmenuVisible,
