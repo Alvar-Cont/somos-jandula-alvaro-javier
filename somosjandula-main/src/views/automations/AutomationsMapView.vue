@@ -11,9 +11,17 @@
       <div v-show="summaryExpanded" class="summary-table-wrapper">
         <table class="summary-table">
           <tbody>
-            <tr v-for="item in ultimasTelemetrias" :key="item.ssid">
-              <td class="network-name">{{ item.ssid }}</td>
-              <td :class="['status-dot', obtenerClaseEstado(item.estado)]"></td>
+            <tr
+              v-for="item in ultimasTelemetrias"
+              :key="item.ssid"
+              class="summary-row"
+              :data-last-update="`Última actualización: ${formatearFecha(item.fechaReporte)}`"
+            >
+              <td class="network-name" :title="`Última actualización: ${formatearFecha(item.fechaReporte)}`">{{ item.ssid }}</td>
+              <td
+                :class="['status-dot', obtenerClaseEstado(item.estado)]"
+                :title="`Última actualización: ${formatearFecha(item.fechaReporte)}`"
+              ></td>
             </tr>
           </tbody>
         </table>
@@ -709,6 +717,18 @@ const obtenerClaseEstado = (estado: string) => {
   return clases[estado] || 'desconocido'
 }
 
+const formatearFecha = (timestamp: string) => {
+  const fecha = new Date(timestamp)
+  return fecha.toLocaleString('es-ES', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+}
+
 onMounted(async () => {
   if (window.innerWidth <= 768) {
     summaryExpanded.value = false
@@ -1130,6 +1150,32 @@ button:hover {
 
 .summary-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-table tbody tr.summary-row {
+  position: relative;
+  cursor: help;
+}
+
+.summary-table tbody tr.summary-row:hover {
+  background: #f5f8ff;
+}
+
+.summary-table tbody tr.summary-row:hover::after {
+  content: attr(data-last-update);
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: calc(100% + 2px);
+  z-index: 200;
+  background: #1f2937;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.78em;
+  line-height: 1.25;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
 }
 
 .summary-table tbody tr:last-child {

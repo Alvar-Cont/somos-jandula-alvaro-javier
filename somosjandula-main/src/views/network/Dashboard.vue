@@ -33,9 +33,9 @@
             </div>
           </div>
           <div class="status-timestamp">
-            <p>🕐 Última actualización:</p>
+            <p>Última actualización:</p>
             <p>{{ formatearFecha(item.fechaReporte) }}</p>
-            <p>⏱️ Tiempo de medición:</p>
+            <p>Tiempo de medición:</p>
             <p>{{ tiempoMedicionGlobal }}</p>
           </div>
         </div>
