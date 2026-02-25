@@ -2,15 +2,22 @@
   <div class="contenedor-scroll-horizontal" id="djg-main-box">
     <!-- Tabla resumen esquina superior derecha -->
     <div class="networks-summary-table">
-      <h4 class="summary-title">🌐 Redes</h4>
-      <table class="summary-table">
-        <tbody>
-          <tr v-for="item in ultimasTelemetrias" :key="item.ssid">
-            <td class="network-name">{{ item.ssid }}</td>
-            <td :class="['status-dot', obtenerClaseEstado(item.estado)]"></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="summary-header">
+        <h4 class="summary-title">🌐 Redes</h4>
+        <button class="summary-toggle-btn" @click="summaryExpanded = !summaryExpanded">
+          {{ summaryExpanded ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      <div v-show="summaryExpanded" class="summary-table-wrapper">
+        <table class="summary-table">
+          <tbody>
+            <tr v-for="item in ultimasTelemetrias" :key="item.ssid">
+              <td class="network-name">{{ item.ssid }}</td>
+              <td :class="['status-dot', obtenerClaseEstado(item.estado)]"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- PANEL IZQUIERDO -->
@@ -225,6 +232,7 @@ import {
 const isToastOpen = ref(false)
 const toastMessage = ref('')
 const toastColor = ref('success')
+const summaryExpanded = ref(true)
 
 type Planta = 'baja' | 'primera' | 'segunda'
 
@@ -702,6 +710,10 @@ const obtenerClaseEstado = (estado: string) => {
 }
 
 onMounted(async () => {
+  if (window.innerWidth <= 768) {
+    summaryExpanded.value = false
+  }
+
   cargarTelemetria()
   await cargarCursosYEspaciosFijos()
 
@@ -1071,20 +1083,47 @@ button:hover {
   padding: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 100;
+  width: min(220px, calc(100vw - 24px));
   max-width: 220px;
   font-size: 0.85em;
 }
 
+.summary-table-wrapper {
+  width: 100%;
+  max-height: 35vh;
+  overflow: auto;
+}
+
 .summary-title {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 0.9em;
   font-weight: 600;
   color: #333;
   padding: 0;
 }
 
+.summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.summary-toggle-btn {
+  display: none;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  color: #333;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.75em;
+  cursor: pointer;
+}
+
 .summary-table {
   width: 100%;
+  min-width: 170px;
   border-collapse: collapse;
   margin: 0;
 }
@@ -1136,5 +1175,50 @@ button:hover {
 
 .status-dot.desconocido::before {
   background-color: #6c757d;
+}
+
+@media (max-width: 768px) {
+  .networks-summary-table {
+    top: 70px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-width: none;
+    padding: 8px;
+    font-size: 0.8em;
+  }
+
+  .summary-title {
+    font-size: 0.85em;
+  }
+
+  .summary-header {
+    margin-bottom: 6px;
+  }
+
+  .summary-toggle-btn {
+    display: inline-flex;
+  }
+
+  .summary-table-wrapper {
+    max-height: 28vh;
+  }
+
+  .network-name {
+    max-width: none;
+    white-space: normal;
+    word-break: break-word;
+    padding: 5px 6px;
+  }
+
+  .status-dot {
+    width: 16px;
+    padding: 5px 4px;
+  }
+
+  .status-dot::before {
+    width: 8px;
+    height: 8px;
+  }
 }
 </style>

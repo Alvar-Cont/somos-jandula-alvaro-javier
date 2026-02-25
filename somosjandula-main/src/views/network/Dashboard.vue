@@ -35,6 +35,8 @@
           <div class="status-timestamp">
             <p>🕐 Última actualización:</p>
             <p>{{ formatearFecha(item.fechaReporte) }}</p>
+            <p>⏱️ Tiempo de medición:</p>
+            <p>{{ tiempoMedicionGlobal }}</p>
           </div>
         </div>
       </div>
@@ -76,6 +78,7 @@
 
 <script>
 import { SESSION_JWT_TOKEN } from '@/utils/constants'
+import { getAuth } from 'firebase/auth'
 
 export default {
   name: 'Dashboard',
@@ -83,7 +86,8 @@ export default {
     return {
       telemetria: [],  // Array con todos los registros de telemetría
       cargando: true,  // Flag para mostrar estado de carga
-      estadoExpandido: false  // Flag para expandir/contraer vista
+      estadoExpandido: false,  // Flag para expandir/contraer vista
+      intervalId: null
     }
   },
   computed: {
@@ -103,9 +107,55 @@ export default {
       return [...this.telemetria].sort((a, b) => 
         new Date(b.fechaReporte) - new Date(a.fechaReporte)
       )
+    },
+    // Muestra el intervalo de refresco configurado
+    tiempoMedicionGlobal() {
+      const { autoRefresh, refreshInterval } = this.obtenerConfiguracionRefresh()
+
+      if (!autoRefresh) {
+        return 'Desactivado'
+      }
+
+      return `${refreshInterval} min`
     }
   },
   methods: {
+    getStorageKey() {
+      const auth = getAuth()
+      const email = auth.currentUser?.email || 'default'
+      return `network_config_${email}`
+    },
+    obtenerConfiguracionRefresh() {
+      const configRaw = localStorage.getItem(this.getStorageKey()) || localStorage.getItem('config')
+      if (!configRaw) {
+        return { autoRefresh: true, refreshInterval: 30 }
+      }
+
+      try {
+        const parsed = JSON.parse(configRaw)
+        const autoRefresh = parsed.autoRefresh !== false
+        const refreshInterval = Number(parsed.refreshInterval) > 0 ? Number(parsed.refreshInterval) : 30
+        return { autoRefresh, refreshInterval }
+      } catch (error) {
+        return { autoRefresh: true, refreshInterval: 30 }
+      }
+    },
+    iniciarAutoRefresh() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId)
+        this.intervalId = null
+      }
+
+      const { autoRefresh, refreshInterval } = this.obtenerConfiguracionRefresh()
+      if (!autoRefresh) {
+        return
+      }
+
+      const intervalMs = refreshInterval * 60 * 1000
+      this.intervalId = setInterval(() => {
+        this.cargarTelemetria()
+      }, intervalMs)
+    },
     // Carga los registros de telemetría del servidor
     async cargarTelemetria() {
       this.cargando = true
@@ -166,6 +216,13 @@ export default {
   },
   mounted() {
     this.cargarTelemetria()
+    this.iniciarAutoRefresh()
+  },
+  beforeUnmount() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = null
+    }
   }
 }
 </script>

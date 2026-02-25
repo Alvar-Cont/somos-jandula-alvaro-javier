@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import { getAuth } from 'firebase/auth'
+
 export default {
   name: 'Configuracion',
   data() {
@@ -68,24 +70,41 @@ export default {
     }
   },
   methods: {
-    guardarConfiguracion() {
-      alert('✅ Configuración guardada exitosamente')
-      // Guardar en localStorage
-      localStorage.setItem('config', JSON.stringify({
+    getStorageKey() {
+      const auth = getAuth()
+      const email = auth.currentUser?.email || 'default'
+      return `network_config_${email}`
+    },
+    persistirConfiguracion() {
+      localStorage.setItem(this.getStorageKey(), JSON.stringify({
         autoRefresh: this.autoRefresh,
         refreshInterval: this.refreshInterval,
         tema: this.tema
       }))
+    },
+    guardarConfiguracion() {
+      alert('✅ Configuración guardada exitosamente')
+      this.persistirConfiguracion()
     }
   },
   mounted() {
-    // Cargar configuración guardada
-    const config = localStorage.getItem('config')
+    const config = localStorage.getItem(this.getStorageKey()) || localStorage.getItem('config')
     if (config) {
       const parsed = JSON.parse(config)
       this.autoRefresh = parsed.autoRefresh
       this.refreshInterval = parsed.refreshInterval
       this.tema = parsed.tema
+    }
+  },
+  watch: {
+    autoRefresh() {
+      this.persistirConfiguracion()
+    },
+    refreshInterval() {
+      this.persistirConfiguracion()
+    },
+    tema() {
+      this.persistirConfiguracion()
     }
   }
 }
