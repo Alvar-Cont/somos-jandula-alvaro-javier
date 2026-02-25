@@ -1110,8 +1110,8 @@ button:hover {
 
 .summary-table-wrapper {
   width: 100%;
-  max-height: 35vh;
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 .summary-title {
@@ -1247,7 +1247,8 @@ button:hover {
   }
 
   .summary-table-wrapper {
-    max-height: 28vh;
+    max-height: none;
+    overflow: visible;
   }
 
   .network-name {
