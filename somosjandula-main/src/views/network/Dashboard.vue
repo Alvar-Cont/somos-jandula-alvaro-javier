@@ -75,6 +75,8 @@
 </template>
 
 <script>
+import { SESSION_JWT_TOKEN } from '@/utils/constants'
+
 export default {
   name: 'Dashboard',
   data() {
@@ -105,21 +107,23 @@ export default {
   },
   methods: {
     // Carga los registros de telemetría del servidor
-    cargarTelemetria() {
+    async cargarTelemetria() {
       this.cargando = true
       try {
-        fetch('http://localhost:8084/registros-redes')
-          .then(res => res.json())
-          .then(data => {
-            this.telemetria = Array.isArray(data) ? data : []
-            this.cargando = false
-          })
-          .catch(err => {
-            console.log('Error cargando telemetría:', err)
-            this.cargando = false
-          })
+        const token = sessionStorage.getItem(SESSION_JWT_TOKEN)
+        const response = await fetch('http://localhost:8084/registros-redes', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        })
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`)
+        }
+
+        const data = await response.json()
+        this.telemetria = Array.isArray(data) ? data : []
       } catch (error) {
-        console.log('Error:', error)
+        console.log('Error cargando telemetría:', error)
+      } finally {
         this.cargando = false
       }
     },

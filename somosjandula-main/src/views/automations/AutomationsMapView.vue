@@ -213,6 +213,7 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount, onMounted } from 'vue'
 import { obtenerDispositivos, } from '@/services/automations'
+import { obtenerTokenJWTValido } from '@/services/firebaseService'
 import {
   obtenerCursosAcademicos,
   obtenerEspaciosFijo,
@@ -658,29 +659,36 @@ const recargarEspaciosFijos = async () => {
 applyDimensions()
 
 // Telemetría - Redes
-type TelemetriaItem = { id: number; ssid: string; estado: string; timestamp: string }
+type TelemetriaItem = { id: number; ssid: string; estado: string; fechaReporte: string }
 const telemetria = ref<TelemetriaItem[]>([])
 
 const ultimasTelemetrias = computed(() => {
   const mapa = new Map<string, TelemetriaItem>()
   for (const item of telemetria.value) {
-    if (!mapa.has(item.ssid) || new Date(item.timestamp) > new Date(mapa.get(item.ssid)!.timestamp)) {
+    if (!mapa.has(item.ssid) || new Date(item.fechaReporte) > new Date(mapa.get(item.ssid)!.fechaReporte)) {
       mapa.set(item.ssid, item)
     }
   }
   return Array.from(mapa.values())
 })
 
-const cargarTelemetria = () => {
+const cargarTelemetria = async () => {
   try {
-    fetch('http://localhost:8084/registros-redes')
-      .then(res => res.json())
-      .then(data => {
-        telemetria.value = Array.isArray(data) ? data : []
-      })
-      .catch(err => console.log('Error cargando telemetría:', err))
+    const token = await obtenerTokenJWTValido(toastMessage, toastColor, isToastOpen)
+    const response = await fetch('http://localhost:8084/registros-redes', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    telemetria.value = Array.isArray(data) ? data : []
   } catch (error) {
-    console.log('Error:', error)
+    console.log('Error cargando telemetría:', error)
   }
 }
 

@@ -14,18 +14,17 @@
 
       <div class="config-section">
         <h3>Intervalo de Refresco</h3>
-        <div class="slider-container">
-          <input 
-            v-model.number="refreshInterval" 
-            type="range" 
-            min="5" 
-            max="120" 
-            step="5"
-            class="range-slider"
+        <div class="input-container">
+          <input
+            v-model.number="refreshInterval"
+            type="number"
+            min="1"
+            step="1"
+            class="number-input"
           />
-          <span class="value-display">{{ refreshInterval }}s</span>
+          <span class="value-display">min</span>
         </div>
-        <p class="description">Los datos se actualizarán cada {{ refreshInterval }} segundos</p>
+        <p class="description">Los datos se actualizarán cada {{ refreshInterval }} minuto(s)</p>
       </div>
 
       <button @click="guardarConfiguracion" class="btn btn-primary">
@@ -188,9 +187,30 @@ input:checked + .slider:before {
   margin: 15px 0;
 }
 
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
 .range-slider {
   flex: 1;
   cursor: pointer;
+}
+
+.number-input {
+  width: 120px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .value-display {

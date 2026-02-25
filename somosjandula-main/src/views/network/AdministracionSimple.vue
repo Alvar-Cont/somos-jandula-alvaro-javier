@@ -88,6 +88,8 @@
 </template>
 
 <script>
+import { SESSION_JWT_TOKEN } from '@/utils/constants'
+
 export default {
   name: 'Administracion',
   data() {
@@ -106,21 +108,23 @@ export default {
   },
   methods: {
     // Carga la lista de redes desde el servidor
-    cargarRedes() {
+    async cargarRedes() {
       this.cargando = true
       try {
-        fetch('http://localhost:8084/configuracion-redes')
-          .then(res => res.json())
-          .then(data => {
-            this.redes = Array.isArray(data) ? data : []
-            this.cargando = false
-          })
-          .catch(err => {
-            console.log('Error cargando redes:', err)
-            this.cargando = false
-          })
+        const token = sessionStorage.getItem(SESSION_JWT_TOKEN)
+        const response = await fetch('http://localhost:8084/configuracion-redes', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        })
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`)
+        }
+
+        const data = await response.json()
+        this.redes = Array.isArray(data) ? data : []
       } catch (error) {
-        console.log('Error:', error)
+        console.log('Error cargando redes:', error)
+      } finally {
         this.cargando = false
       }
     },
@@ -140,12 +144,14 @@ export default {
 
       try {
         this.guardando = true
+        const token = sessionStorage.getItem(SESSION_JWT_TOKEN)
         
         // Enviar POST al servidor
         const response = await fetch('http://localhost:8084/configuracion-redes', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
           },
           body: JSON.stringify(this.nuevaRed)
         })
