@@ -230,10 +230,10 @@ export default {
 <style scoped>
 .fullscreen {
   position: fixed;
-  top: 0;
+  top: calc(56px + env(safe-area-inset-top));
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 56px - env(safe-area-inset-top));
   background-color: #f5f5f5;
   z-index: 9999;
   overflow: auto;
