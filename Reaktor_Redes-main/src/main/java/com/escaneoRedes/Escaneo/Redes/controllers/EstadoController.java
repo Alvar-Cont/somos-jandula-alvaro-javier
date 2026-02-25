@@ -32,4 +32,15 @@ public class EstadoController {
         credencialService.borrarRedPorId(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Endpoint temporal para migrar passwords existentes a formato hasheado.
+     * Solo ejecutar UNA VEZ para actualizar passwords legacy.
+     * Después de ejecutarlo, puede eliminarse este endpoint.
+     */
+    @PostMapping("/migrar-passwords")
+    public ResponseEntity<?> migrarPasswords() {
+        int passwordsActualizadas = credencialService.migrarPasswordsAHash();
+        return ResponseEntity.ok().body("Se hashearon " + passwordsActualizadas + " passwords");
+    }
 }
