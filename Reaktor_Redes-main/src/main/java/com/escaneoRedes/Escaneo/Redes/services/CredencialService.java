@@ -8,6 +8,8 @@ import com.escaneoRedes.Escaneo.Redes.models.CredencialEntity;
 import com.escaneoRedes.Escaneo.Redes.repositories.CredencialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +63,17 @@ public class CredencialService {
         List<ConfigDTO> confList = new ArrayList<>();
         
         for (CredencialEntity c : redesGuardadas) {
-            ConfigDTO dto = new ConfigDTO(c.getSsid(), c.getUsuario(), c.getPassword(), c.getSeguridad());
+            ConfigDTO dto = new ConfigDTO(c.getId(), c.getSsid(), c.getUsuario(), c.getPassword(), c.getSeguridad());
             confList.add(dto);
         }
         
         return confList;
+    }
+
+    public void borrarRedPorId(Long id) {
+        if (!credencialRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una red con id " + id);
+        }
+        credencialRepository.deleteById(id);
     }
 }

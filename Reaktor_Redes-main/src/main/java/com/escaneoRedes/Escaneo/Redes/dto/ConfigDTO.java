@@ -2,6 +2,7 @@ package com.escaneoRedes.Escaneo.Redes.dto;
 
 public class ConfigDTO {
     
+    private Long id;
     private String ssid;
     private String usuario;
     private String password;
@@ -12,7 +13,8 @@ public class ConfigDTO {
     }
 
     // Constructor con todos los parámetros
-    public ConfigDTO(String ssid, String usuario, String password, String seguridad) {
+    public ConfigDTO(Long id, String ssid, String usuario, String password, String seguridad) {
+        this.id = id;
         this.ssid = ssid;
         this.usuario = usuario;
         this.password = password;
@@ -20,6 +22,14 @@ public class ConfigDTO {
     }
 
     // Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getSsid() {
         return ssid;
     }

@@ -26,4 +26,10 @@ public class EstadoController {
         List<ConfigDTO> confList = credencialService.obtenerTodasLasRedes();
         return ResponseEntity.ok().body(confList);
     }
+
+    @DeleteMapping("/configuracion-redes/{id}")
+    public ResponseEntity<?> borrarRed(@PathVariable Long id) {
+        credencialService.borrarRedPorId(id);
+        return ResponseEntity.noContent().build();
+    }
 }

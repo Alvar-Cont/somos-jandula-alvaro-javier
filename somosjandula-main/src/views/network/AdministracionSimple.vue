@@ -66,7 +66,7 @@
       </div>
 
       <div v-else class="networks-grid">
-        <div v-for="(red, index) in redes" :key="index" class="network-card">
+        <div v-for="red in redes" :key="red.id ?? red.ssid" class="network-card">
           <div class="network-header">
             <div class="network-info">
               <h3>{{ red.ssid }}</h3>
@@ -76,11 +76,14 @@
             </div>
             <span class="network-icon">📶</span>
           </div>
-          <!-- Funcionalidad de eliminar comentada: endpoint DELETE no disponible en backend
-          <button @click="eliminarRed(index)" class="btn btn-danger btn-small">
-            🗑️ Eliminar
+          <button
+            @click="eliminarRed(red)"
+            class="btn btn-danger btn-small"
+            :disabled="eliminandoId === red.id"
+          >
+            <span v-if="eliminandoId === red.id">Eliminando...</span>
+            <span v-else>Eliminar</span>
           </button>
-          -->
         </div>
       </div>
     </div>
@@ -103,7 +106,8 @@ export default {
       },
       redes: [],  // Lista de redes cargadas del servidor
       guardando: false,  // Flag para deshabilitar botón mientras se guarda
-      cargando: true  // Flag para mostrar "cargando..." al iniciar
+      cargando: true,  // Flag para mostrar "cargando..." al iniciar
+      eliminandoId: null
     }
   },
   methods: {
@@ -168,7 +172,7 @@ export default {
           }
           
           // Recargar la lista
-          this.cargarRedes()
+          await this.cargarRedes()
         } else {
           alert('❌ Error al agregar la red')
         }
@@ -177,6 +181,40 @@ export default {
         alert('❌ Error de conexión con el servidor')
       } finally {
         this.guardando = false
+      }
+    },
+    async eliminarRed(red) {
+      if (!red?.id) {
+        alert('❌ No se puede borrar esta red: falta el identificador')
+        return
+      }
+
+      const confirmar = confirm(`¿Seguro que quieres eliminar la red "${red.ssid}"?`)
+      if (!confirmar) {
+        return
+      }
+
+      try {
+        this.eliminandoId = red.id
+        const token = sessionStorage.getItem(SESSION_JWT_TOKEN)
+
+        const response = await fetch(`http://localhost:8084/configuracion-redes/${red.id}`, {
+          method: 'DELETE',
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`)
+        }
+
+        this.redes = this.redes.filter(item => item.id !== red.id)
+      } catch (error) {
+        console.error('Error eliminando red:', error)
+        alert('❌ Error al eliminar la red')
+      } finally {
+        this.eliminandoId = null
       }
     },
     // Oculta la contraseña mostrando puntos
