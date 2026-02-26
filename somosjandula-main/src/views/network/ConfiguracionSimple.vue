@@ -59,6 +59,7 @@
 
 <script>
 import { getAuth } from 'firebase/auth'
+import { SESSION_JWT_TOKEN } from '@/utils/constants'
 
 export default {
   name: 'Configuracion',
@@ -75,36 +76,104 @@ export default {
       const email = auth.currentUser?.email || 'default'
       return `network_config_${email}`
     },
-    persistirConfiguracion() {
+    persistirConfiguracionLocal() {
       localStorage.setItem(this.getStorageKey(), JSON.stringify({
         autoRefresh: this.autoRefresh,
         refreshInterval: this.refreshInterval,
         tema: this.tema
       }))
     },
-    guardarConfiguracion() {
-      alert('✅ Configuración guardada exitosamente')
-      this.persistirConfiguracion()
+    obtenerHeadersAuth() {
+      const token = sessionStorage.getItem(SESSION_JWT_TOKEN)
+      return token ? { Authorization: `Bearer ${token}` } : {}
+    },
+    normalizarConfiguracion(config) {
+      if (!config) {
+        return { autoRefresh: true, refreshInterval: 30, tema: 'light' }
+      }
+
+      return {
+        autoRefresh: config.autoRefresh !== false,
+        refreshInterval: Number(config.refreshInterval) > 0 ? Number(config.refreshInterval) : 30,
+        tema: config.tema || 'light'
+      }
+    },
+    cargarConfiguracionLocal() {
+      const config = localStorage.getItem(this.getStorageKey()) || localStorage.getItem('config')
+      if (!config) {
+        return
+      }
+
+      try {
+        const parsed = JSON.parse(config)
+        const normalizada = this.normalizarConfiguracion(parsed)
+        this.autoRefresh = normalizada.autoRefresh
+        this.refreshInterval = normalizada.refreshInterval
+        this.tema = normalizada.tema
+      } catch (error) {
+        console.log('No se pudo leer configuración local:', error)
+      }
+    },
+    async cargarConfiguracionBackend() {
+      try {
+        const response = await fetch('http://localhost:8084/configuracion-refresh-redes', {
+          headers: this.obtenerHeadersAuth()
+        })
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`)
+        }
+
+        const config = await response.json()
+        const normalizada = this.normalizarConfiguracion(config)
+        this.autoRefresh = normalizada.autoRefresh
+        this.refreshInterval = normalizada.refreshInterval
+        this.tema = normalizada.tema
+        this.persistirConfiguracionLocal()
+      } catch (error) {
+        this.cargarConfiguracionLocal()
+      }
+    },
+    async guardarConfiguracion() {
+      const payload = {
+        autoRefresh: this.autoRefresh,
+        refreshInterval: this.refreshInterval
+      }
+
+      try {
+        const response = await fetch('http://localhost:8084/configuracion-refresh-redes', {
+          method: 'PUT',
+          headers: {
+            ...this.obtenerHeadersAuth(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        })
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`)
+        }
+
+        this.persistirConfiguracionLocal()
+        alert('✅ Configuración guardada exitosamente')
+      } catch (error) {
+        this.persistirConfiguracionLocal()
+        alert('⚠️ No se pudo guardar en backend. Se guardó localmente en este navegador.')
+      }
     }
   },
-  mounted() {
-    const config = localStorage.getItem(this.getStorageKey()) || localStorage.getItem('config')
-    if (config) {
-      const parsed = JSON.parse(config)
-      this.autoRefresh = parsed.autoRefresh
-      this.refreshInterval = parsed.refreshInterval
-      this.tema = parsed.tema
-    }
+  async mounted() {
+    await this.cargarConfiguracionBackend()
   },
   watch: {
     autoRefresh() {
-      this.persistirConfiguracion()
+      this.persistirConfiguracionLocal()
     },
     refreshInterval() {
-      this.persistirConfiguracion()
+      this.persistirConfiguracionLocal()
     },
     tema() {
-      this.persistirConfiguracion()
+      this.persistirConfiguracionLocal()
     }
   }
 }

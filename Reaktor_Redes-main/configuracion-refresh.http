@@ -1,0 +1,26 @@
+@baseUrl = http://localhost:8084
+@jwt = PEGA_AQUI_TU_JWT_REAKTOR
+
+### Obtener configuración de refresh del usuario autenticado
+GET {{baseUrl}}/configuracion-refresh-redes
+Authorization: Bearer {{jwt}}
+
+### Guardar configuración de refresh del usuario autenticado
+PUT {{baseUrl}}/configuracion-refresh-redes
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "autoRefresh": true,
+  "refreshInterval": 15
+}
+
+### Desactivar auto refresh
+PUT {{baseUrl}}/configuracion-refresh-redes
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "autoRefresh": false,
+  "refreshInterval": 30
+}

@@ -87,7 +87,11 @@ export default {
       telemetria: [],  // Array con todos los registros de telemetría
       cargando: true,  // Flag para mostrar estado de carga
       estadoExpandido: false,  // Flag para expandir/contraer vista
-      intervalId: null
+      intervalId: null,
+      configRefresh: {
+        autoRefresh: true,
+        refreshInterval: 30
+      }
     }
   },
   computed: {
@@ -110,7 +114,7 @@ export default {
     },
     // Muestra el intervalo de refresco configurado
     tiempoMedicionGlobal() {
-      const { autoRefresh, refreshInterval } = this.obtenerConfiguracionRefresh()
+      const { autoRefresh, refreshInterval } = this.configRefresh
 
       if (!autoRefresh) {
         return 'Desactivado'
@@ -125,7 +129,21 @@ export default {
       const email = auth.currentUser?.email || 'default'
       return `network_config_${email}`
     },
-    obtenerConfiguracionRefresh() {
+    obtenerHeadersAuth() {
+      const token = sessionStorage.getItem(SESSION_JWT_TOKEN)
+      return token ? { Authorization: `Bearer ${token}` } : {}
+    },
+    normalizarConfiguracionRefresh(config) {
+      if (!config) {
+        return { autoRefresh: true, refreshInterval: 30 }
+      }
+
+      return {
+        autoRefresh: config.autoRefresh !== false,
+        refreshInterval: Number(config.refreshInterval) > 0 ? Number(config.refreshInterval) : 30
+      }
+    },
+    obtenerConfiguracionRefreshLocal() {
       const configRaw = localStorage.getItem(this.getStorageKey()) || localStorage.getItem('config')
       if (!configRaw) {
         return { autoRefresh: true, refreshInterval: 30 }
@@ -133,11 +151,29 @@ export default {
 
       try {
         const parsed = JSON.parse(configRaw)
-        const autoRefresh = parsed.autoRefresh !== false
-        const refreshInterval = Number(parsed.refreshInterval) > 0 ? Number(parsed.refreshInterval) : 30
-        return { autoRefresh, refreshInterval }
+        return this.normalizarConfiguracionRefresh(parsed)
       } catch (error) {
         return { autoRefresh: true, refreshInterval: 30 }
+      }
+    },
+    persistirConfiguracionRefreshLocal(config) {
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(config))
+    },
+    async cargarConfiguracionRefresh() {
+      try {
+        const response = await fetch('http://localhost:8084/configuracion-refresh-redes', {
+          headers: this.obtenerHeadersAuth()
+        })
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`)
+        }
+
+        const config = await response.json()
+        this.configRefresh = this.normalizarConfiguracionRefresh(config)
+        this.persistirConfiguracionRefreshLocal(this.configRefresh)
+      } catch (error) {
+        this.configRefresh = this.obtenerConfiguracionRefreshLocal()
       }
     },
     iniciarAutoRefresh() {
@@ -146,7 +182,7 @@ export default {
         this.intervalId = null
       }
 
-      const { autoRefresh, refreshInterval } = this.obtenerConfiguracionRefresh()
+      const { autoRefresh, refreshInterval } = this.configRefresh
       if (!autoRefresh) {
         return
       }
@@ -214,7 +250,8 @@ export default {
       })
     }
   },
-  mounted() {
+  async mounted() {
+    await this.cargarConfiguracionRefresh()
     this.cargarTelemetria()
     this.iniciarAutoRefresh()
   },
