@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class EstadoController {
 
     @Autowired
@@ -33,14 +34,4 @@ public class EstadoController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Endpoint temporal para migrar passwords existentes a formato hasheado.
-     * Solo ejecutar UNA VEZ para actualizar passwords legacy.
-     * Después de ejecutarlo, puede eliminarse este endpoint.
-     */
-    @PostMapping("/migrar-passwords")
-    public ResponseEntity<?> migrarPasswords() {
-        int passwordsActualizadas = credencialService.migrarPasswordsAHash();
-        return ResponseEntity.ok().body("Se hashearon " + passwordsActualizadas + " passwords");
-    }
 }

@@ -64,6 +64,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { obtenerRolesUsuario } from '@/services/firebaseService';
 import { firebaseConfig } from '@/environment/firebaseConfig';
 import { APP_VERSION, SESSION_JWT_TOKEN } from '@/utils/constants';
+import { isLoggingIn, setLoggingInStatus } from '@/utils/authState';
 
 // Inicializar Firebase
 const firebaseApp = initializeApp(firebaseConfig);
@@ -105,8 +106,6 @@ const toastColor = ref('success');
 
 const app = createApp(App).use(IonicVue).use(router);
 
-let isLoggingIn = false; // Variable para detectar el estado de login
-
 const auth = getAuth();
 onAuthStateChanged(auth, (user) =>
 {
@@ -141,9 +140,7 @@ onAuthStateChanged(auth, (user) =>
   }
 });
 
-export function setLoggingInStatus(status: boolean) {
-  isLoggingIn = status; // Función para actualizar el estado
-}
+export { setLoggingInStatus };
 
 // Montar la aplicación cuando el router esté listo
 router.isReady().then(() => {

@@ -50,7 +50,7 @@ import { obtenerRolesUsuario } from '@/services/firebaseService.js';
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { firebaseConfig } from '@/environment/firebaseConfig';
-import { setLoggingInStatus } from '@/main'; // Importa la función del estado
+import { setLoggingInStatus } from '@/utils/authState';
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig) ;
